@@ -1,0 +1,42 @@
+services:
+  journal-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: private-journal
+    ports:
+      - "${HOST_PORT:-9090}:3001"
+    volumes:
+      # Mount database directory for persistence
+      - ${DB_PATH:-./data}:/data
+    environment:
+      # Application environment
+      - NODE_ENV=${NODE_ENV:-production}
+      
+      # Server port
+      - PORT=${PORT:-3001}
+      
+      # Database path (inside container)
+      - DB_PATH=/data/journal.db
+      
+      # Timezone
+      - TZ=${TZ:-UTC}
+      
+      # AES Encryption key (REQUIRED for production!)
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      
+      # Frontend URL for CORS (production)
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:8080}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+# Named volume for persistent data
+volumes:
+  journal-data:
+    driver: local
+
