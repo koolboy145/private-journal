@@ -139,8 +139,6 @@ npm run build
 ENCRYPTION_KEY="your-key" npm run server
 ```
 
-See [Developer Documentation](DEVELOPER.md) for detailed build instructions.
-
 ---
 
 ## ⚙️ Configuration
@@ -253,7 +251,6 @@ Docker automatically pulls the correct image for your platform.
 ### Quick Links
 
 - **[Docker Hub README](DOCKER-HUB-README.md)** - Docker deployment guide
-- **[Developer Documentation](DEVELOPER.md)** - Technical details and development
 - **[Environment Setup](ENV-SETUP-GUIDE.md)** - Complete environment configuration
 - **[ARM Support](ARM-SUPPORT.md)** - Raspberry Pi and ARM deployment
 
@@ -327,15 +324,6 @@ Contributions are welcome! Here's how you can help:
 - 🔧 Submit pull requests
 - ⭐ Star the project
 
-### Development Setup
-
-See [DEVELOPER.md](DEVELOPER.md) for:
-- Development environment setup
-- Code structure
-- API documentation
-- Testing guidelines
-- Contribution workflow
-
 ### Quick Contribution Guide
 
 1. Fork the repository
@@ -373,7 +361,6 @@ Built with:
 
 ## 📞 Support
 
-- 📖 [Documentation](DEVELOPER.md)
 - 🐛 [Issue Tracker](https://github.com/your-username/private-journal/issues)
 - 💬 [Discussions](https://github.com/your-username/private-journal/discussions)
 
@@ -383,7 +370,6 @@ Built with:
 
 - **Docker Hub:** [your-username/private-journal](https://hub.docker.com/r/your-username/private-journal)
 - **GitHub:** [your-username/private-journal](https://github.com/your-username/private-journal)
-- **Documentation:** [Full Docs](DEVELOPER.md)
 
 ---
 
