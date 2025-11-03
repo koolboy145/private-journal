@@ -13,6 +13,10 @@
 - 🔐 **End-to-End Encryption** - AES-256-GCM encryption for all diary entries
 - 📝 **Rich Text Editor** - WYSIWYG editor with Markdown support, formatting, links, and lists
 - 📊 **Visual Dashboard** - Statistics, graphs, and recent entries at a glance
+- 🏷️ **Tag System** - Organize entries with custom color-coded tags
+- 🔔 **Reminders & Notifications** - Email and webhook notifications (Discord, Slack, etc.)
+- 📋 **Entry Templates** - Create and use custom entry templates
+- 😊 **Mood Tracking** - Track your mood with each entry
 - 🌓 **Dark Mode** - Beautiful dark theme that's easy on the eyes
 - 💾 **Data Portability** - Export/import as CSV with optional encryption
 - 🔄 **Autosave** - Automatic saving as you type (configurable)
@@ -20,6 +24,7 @@
 - 🐳 **Easy Deployment** - Docker container with multi-architecture support
 - 🛡️ **Secure by Design** - Runs as non-root user, includes security headers
 - 🍓 **ARM Support** - Works on Raspberry Pi 4/5 and Apple Silicon
+- 📅 **Multiple Entries per Day** - Create unlimited entries per date
 
 ---
 
@@ -49,7 +54,7 @@ cat > .env.docker << EOF
 ENCRYPTION_KEY=your-generated-key-here
 NODE_ENV=production
 HOST_PORT=9090
-DB_PATH=./data
+DB_VOLUME=./data
 TZ=UTC
 EOF
 
@@ -62,7 +67,8 @@ services:
     ports:
       - "${HOST_PORT:-9090}:3001"
     volumes:
-      - ${DB_PATH:-./data}:/data
+      # Data folder will be auto-created if it doesn't exist
+      - ${DB_VOLUME:-./data}:/data
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - TZ=${TZ:-UTC}
@@ -139,6 +145,8 @@ npm run build
 ENCRYPTION_KEY="your-key" npm run server
 ```
 
+For local development, see the project repository for build instructions.
+
 ---
 
 ## ⚙️ Configuration
@@ -155,7 +163,7 @@ ENCRYPTION_KEY="your-key" npm run server
 |----------|---------|-------------|
 | `NODE_ENV` | `production` | Environment mode |
 | `HOST_PORT` | `9090` | External port (Docker only) |
-| `DB_PATH` | `./data` | Database directory |
+| `DB_VOLUME` | `./data` | Database volume mount (auto-created) |
 | `TZ` | `UTC` | Timezone ([list](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) |
 
 ### Example Configurations
@@ -170,11 +178,55 @@ ENCRYPTION_KEY=Kx8vN2mP9qR5tYuI3oL7jK6hG4fD1sA0wZ9xC8vB5nM=
 ENCRYPTION_KEY=Kx8vN2mP9qR5tYuI3oL7jK6hG4fD1sA0wZ9xC8vB5nM=
 NODE_ENV=production
 HOST_PORT=8080
-DB_PATH=/var/lib/journal/data
+DB_VOLUME=/var/lib/journal/data
 TZ=America/New_York
 ```
 
 See [ENV-SETUP-GUIDE.md](ENV-SETUP-GUIDE.md) for complete configuration guide.
+
+### Data Persistence
+
+The application uses a **SQLite database** for storing journal entries. When running with Docker:
+
+**Automatic Data Folder Creation:**
+- If the data folder doesn't exist, it's **automatically created** when the container starts
+- The entrypoint script validates permissions and provides helpful error messages
+- No manual setup required - just run `docker-compose up -d`
+
+**Volume Options:**
+
+1. **Local Directory (Default):**
+   ```yaml
+   volumes:
+     - ./data:/data  # Auto-created if it doesn't exist
+   ```
+
+2. **Named Volume (Managed by Docker):**
+   ```yaml
+   volumes:
+     - journal-data:/data  # Docker manages lifecycle
+   ```
+   Set `DB_VOLUME=journal-data` in `.env.docker`
+
+3. **Custom Path:**
+   ```yaml
+   volumes:
+     - /var/lib/journal:/data  # Your custom path
+   ```
+   Set `DB_VOLUME=/var/lib/journal` in `.env.docker`
+
+**Permission Issues?**
+
+If the container can't write to the data folder:
+```bash
+# Fix permissions (Linux/macOS)
+sudo chown -R 1001:1001 ./data
+
+# Or use named volume instead
+echo "DB_VOLUME=journal-data" >> .env.docker
+```
+
+The container runs as user `1001` (non-root) for security.
 
 ---
 
@@ -250,9 +302,11 @@ Docker automatically pulls the correct image for your platform.
 
 ### Quick Links
 
+- **[Features](FEATURES.md)** - Complete feature list and capabilities
 - **[Docker Hub README](DOCKER-HUB-README.md)** - Docker deployment guide
 - **[Environment Setup](ENV-SETUP-GUIDE.md)** - Complete environment configuration
 - **[ARM Support](ARM-SUPPORT.md)** - Raspberry Pi and ARM deployment
+- **[SMTP Configuration](SMTP_CONFIG.md)** - Email notification setup
 
 ### Common Tasks
 
@@ -361,6 +415,7 @@ Built with:
 
 ## 📞 Support
 
+- 📖 [Documentation](README.md)
 - 🐛 [Issue Tracker](https://github.com/your-username/private-journal/issues)
 - 💬 [Discussions](https://github.com/your-username/private-journal/discussions)
 
@@ -370,6 +425,7 @@ Built with:
 
 - **Docker Hub:** [your-username/private-journal](https://hub.docker.com/r/your-username/private-journal)
 - **GitHub:** [your-username/private-journal](https://github.com/your-username/private-journal)
+- **Documentation:** [README](README.md)
 
 ---
 

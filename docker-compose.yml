@@ -1,3 +1,4 @@
+---
 services:
   journal-app:
     build:
@@ -8,25 +9,43 @@ services:
       - "${HOST_PORT:-9090}:3001"
     volumes:
       # Mount database directory for persistence
-      - ${DB_PATH:-./data}:/data
+      # If ./data doesn't exist, it will be created automatically
+      # Alternatively, use named volume: journal-data:/data
+      - ${DB_VOLUME:-./data}:/data
     environment:
       # Application environment
       - NODE_ENV=${NODE_ENV:-production}
-      
+
       # Server port
       - PORT=${PORT:-3001}
-      
+
       # Database path (inside container)
       - DB_PATH=/data/journal.db
-      
+
       # Timezone
       - TZ=${TZ:-UTC}
-      
+
       # AES Encryption key (REQUIRED for production!)
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
-      
+
       # Frontend URL for CORS (production)
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:8080}
+
+      # SMTP Configuration for email notifications
+      # Required for email reminders to work
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      # Alternative: Use SMTP_SECURITY_PROTOCOL (tls, ssl, or none)
+      # If both are set, SMTP_SECURE takes precedence
+      - SMTP_SECURITY_PROTOCOL=${SMTP_SECURITY_PROTOCOL:-tls}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_FROM=${SMTP_FROM:-}
+      # Optional: Set to 'false' to skip SMTP connection verification on startup
+      - SMTP_VERIFY_CONNECTION=${SMTP_VERIFY_CONNECTION:-true}
+      # Optional: Set to 'true' to reject invalid TLS certificates
+      - SMTP_TLS_REJECT_UNAUTHORIZED=${SMTP_TLS_REJECT_UNAUTHORIZED:-true}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
@@ -35,8 +54,8 @@ services:
       retries: 3
       start_period: 15s
 
-# Named volume for persistent data
+# Named volume for persistent data (optional fallback)
+# To use this instead of ./data, set DB_VOLUME=journal-data in .env.docker
 volumes:
   journal-data:
     driver: local
-

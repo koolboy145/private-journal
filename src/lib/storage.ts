@@ -7,7 +7,7 @@ const generateUUID = (): string => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
-  
+
   // Fallback implementation (RFC4122 version 4 compliant)
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     const r = Math.random() * 16 | 0;
@@ -51,14 +51,14 @@ export const createUser = (username: string, password: string): User => {
   if (users.find(u => u.username === username)) {
     throw new Error('Username already exists');
   }
-  
+
   const newUser: User = {
     id: generateUUID(),
     username,
     password, // WARNING: Not secure - just for demo
     createdAt: new Date().toISOString(),
   };
-  
+
   saveUsers([...users, newUser]);
   return newUser;
 };
@@ -85,10 +85,10 @@ export const updateUserPassword = (userId: string, newPassword: string) => {
   const users = getUsers();
   const userIndex = users.findIndex(u => u.id === userId);
   if (userIndex === -1) throw new Error('User not found');
-  
+
   users[userIndex].password = newPassword;
   saveUsers(users);
-  
+
   // Update current user if it's the same user
   const currentUser = getCurrentUser();
   if (currentUser?.id === userId) {
@@ -117,7 +117,7 @@ export const getEntryByDate = (userId: string, date: string): DiaryEntry | undef
 export const createOrUpdateEntry = (userId: string, date: string, content: string): DiaryEntry => {
   const entries = getEntries();
   const existingIndex = entries.findIndex(e => e.userId === userId && e.date === date);
-  
+
   if (existingIndex >= 0) {
     entries[existingIndex].content = content;
     entries[existingIndex].updatedAt = new Date().toISOString();
@@ -152,28 +152,28 @@ export const exportToCSV = (userId: string): string => {
     e.createdAt,
     e.updatedAt,
   ]);
-  
+
   return [headers, ...rows].map(row => row.join(',')).join('\n');
 };
 
 export const importFromCSV = (userId: string, csvContent: string): number => {
   const lines = csvContent.split('\n').filter(line => line.trim());
   if (lines.length < 2) throw new Error('Invalid CSV format');
-  
+
   const entries = getEntries();
   let importCount = 0;
-  
+
   // Skip header line
   for (let i = 1; i < lines.length; i++) {
     const match = lines[i].match(/^([^,]+),"(.*)","([^"]+)","([^"]+)"$/);
     if (!match) continue;
-    
+
     const [, date, content, createdAt, updatedAt] = match;
     const cleanContent = content.replace(/""/g, '"'); // Unescape quotes
-    
+
     // Check if entry already exists
     const existingIndex = entries.findIndex(e => e.userId === userId && e.date === date);
-    
+
     if (existingIndex >= 0) {
       entries[existingIndex].content = cleanContent;
       entries[existingIndex].updatedAt = updatedAt;
@@ -189,7 +189,7 @@ export const importFromCSV = (userId: string, csvContent: string): number => {
     }
     importCount++;
   }
-  
+
   saveEntries(entries);
   return importCount;
 };

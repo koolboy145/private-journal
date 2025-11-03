@@ -10,7 +10,7 @@ export class SQLiteStore extends Store {
     try {
       const now = Date.now();
       const result = sessionQueries.get.get(sid, now) as { sess: string } | undefined;
-      
+
       if (result) {
         const session = JSON.parse(result.sess);
         callback(null, session);
@@ -27,7 +27,7 @@ export class SQLiteStore extends Store {
       const maxAge = session.cookie.maxAge || 86400000; // Default 1 day
       const expire = Date.now() + maxAge;
       const sess = JSON.stringify(session);
-      
+
       sessionQueries.set.run(sid, sess, expire);
       callback?.();
     } catch (error) {
@@ -67,7 +67,7 @@ export class SQLiteStore extends Store {
     try {
       const maxAge = session.cookie.maxAge || 86400000;
       const expire = Date.now() + maxAge;
-      
+
       sessionQueries.touch.run(expire, sid);
       callback?.();
     } catch (error) {
@@ -75,5 +75,3 @@ export class SQLiteStore extends Store {
     }
   }
 }
-
-

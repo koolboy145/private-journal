@@ -18,18 +18,18 @@ async function getDerivedKey(): Promise<Buffer> {
  */
 export async function encrypt(text: string): Promise<string> {
   if (!text) return '';
-  
+
   try {
     const key = await getDerivedKey();
     const iv = randomBytes(16); // Initialization vector
-    
+
     const cipher = createCipheriv('aes-256-gcm', key, iv);
-    
+
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    
+
     const authTag = cipher.getAuthTag();
-    
+
     // Return format: iv:authTag:encryptedData
     return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
   } catch (error) {
@@ -44,26 +44,26 @@ export async function encrypt(text: string): Promise<string> {
  */
 export async function decrypt(encryptedData: string): Promise<string> {
   if (!encryptedData) return '';
-  
+
   try {
     const key = await getDerivedKey();
-    
+
     // Split the encrypted data
     const parts = encryptedData.split(':');
     if (parts.length !== 3) {
       throw new Error('Invalid encrypted data format');
     }
-    
+
     const [ivHex, authTagHex, encrypted] = parts;
     const iv = Buffer.from(ivHex, 'hex');
     const authTag = Buffer.from(authTagHex, 'hex');
-    
+
     const decipher = createDecipheriv('aes-256-gcm', key, iv);
     decipher.setAuthTag(authTag);
-    
+
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
-    
+
     return decrypted;
   } catch (error) {
     console.error('Decryption error:', error);
@@ -79,4 +79,3 @@ export function isEncrypted(data: string): boolean {
   const parts = data.split(':');
   return parts.length === 3 && parts.every(part => /^[0-9a-f]+$/.test(part));
 }
-

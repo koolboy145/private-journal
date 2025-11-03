@@ -1,6 +1,6 @@
 # Private Journal
 
-A secure, self-hosted private journal application with end-to-end encryption, rich text editing, and modern UI.
+A secure, self-hosted private journal application with end-to-end encryption, rich text editing, and modern UI. Perfect for personal journaling with tags, templates, mood tracking, reminders, and comprehensive analytics.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)
@@ -8,14 +8,21 @@ A secure, self-hosted private journal application with end-to-end encryption, ri
 
 ## Features
 
-- 🔐 **AES-256-GCM Encryption** - All diary entries encrypted at rest
-- 📝 **Rich Text Editor** - WYSIWYG editor with Markdown support
-- 📊 **Dashboard & Analytics** - Visual stats and entry graphs
-- 🌓 **Dark Mode** - Built-in dark mode support
-- 💾 **Import/Export** - CSV export with optional encryption
-- ⚡ **Autosave** - Configurable auto-save feature
-- 🔒 **Privacy First** - Self-hosted, your data stays yours
+- 🔐 **AES-256-GCM Encryption** - All diary entries encrypted at rest with unique IVs
+- 📝 **Rich Text Editor** - WYSIWYG editor (Tiptap) with full Markdown support
+- 🏷️ **Tag System** - Organize entries with custom color-coded tags
+- 🔔 **Reminders & Notifications** - Email and webhook notifications (Discord, Slack, etc.)
+- 📋 **Entry Templates** - Create and use custom entry templates for faster journaling
+- 😊 **Mood Tracking** - Track your mood with each entry
+- 📊 **Dashboard & Analytics** - Visual stats, activity graphs, and mood statistics
+- 🌓 **Dark Mode** - Beautiful dark theme with smooth transitions
+- 💾 **Import/Export** - CSV export/import with optional encryption
+- ⚡ **Autosave** - Configurable automatic saving as you type
+- 🔍 **Search** - Full-text search across all entries
+- 📅 **Multiple Entries per Day** - Create unlimited entries per date
+- 🔒 **Privacy First** - Self-hosted, your data stays on your server
 - 🐳 **Multi-Architecture** - Supports AMD64 and ARM64
+- 🛡️ **Secure by Design** - Non-root container, security headers, session management
 
 ## Supported Platforms
 
@@ -54,6 +61,20 @@ docker run -d \
 
 Open your browser to: **http://localhost:9090**
 
+**First Time Setup:**
+1. Create your account (first user becomes admin)
+2. Start journaling immediately
+3. Customize tags, templates, and reminders as needed
+
+**Key Capabilities:**
+- Write rich text entries with Markdown support
+- Organize with color-coded tags
+- Use templates for faster entry creation
+- Track mood with each entry
+- Set up email or webhook reminders
+- View analytics and activity graphs on the dashboard
+- Export/import data in CSV format
+
 ## Docker Compose (Recommended)
 
 Create `docker-compose.yml`:
@@ -66,11 +87,19 @@ services:
     ports:
       - "9090:3001"
     volumes:
+      # Data folder auto-created if it doesn't exist
       - ./data:/data
     environment:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - NODE_ENV=production
       - TZ=UTC
+      # SMTP Configuration (optional - for email reminders)
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_FROM=${SMTP_FROM:-}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
@@ -83,7 +112,16 @@ services:
 Create `.env` file:
 
 ```env
+# Required
 ENCRYPTION_KEY=your-generated-key-here
+
+# Optional: SMTP for email reminders
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-specific-password
+SMTP_FROM=your-email@gmail.com
 ```
 
 Deploy:
@@ -94,18 +132,46 @@ docker compose up -d
 
 ## Environment Variables
 
+### Required Variables
+
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `ENCRYPTION_KEY` | ✅ Yes | - | AES-256 encryption key (use `openssl rand -base64 32`) |
+
+### Optional Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
 | `NODE_ENV` | No | `production` | Environment mode |
 | `TZ` | No | `UTC` | Timezone ([full list](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) |
+| `PORT` | No | `3001` | Server port (inside container) |
+| `DB_PATH` | No | `/data/journal.db` | Database file path |
+| `FRONTEND_URL` | No | `http://localhost:8080` | Frontend URL for CORS (production) |
+
+### SMTP Configuration (for Email Reminders)
+
+These variables are optional but required if you want to use email reminders:
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `SMTP_HOST` | No | - | SMTP server hostname (e.g., `smtp.gmail.com`) |
+| `SMTP_PORT` | No | `587` | SMTP server port |
+| `SMTP_SECURE` | No | `false` | Use SSL/TLS (set to `true` for port 465) |
+| `SMTP_SECURITY_PROTOCOL` | No | `tls` | Security protocol: `tls`, `ssl`, or `none` |
+| `SMTP_USER` | No | - | SMTP username/email |
+| `SMTP_PASS` | No | - | SMTP password or app-specific password |
+| `SMTP_FROM` | No | - | From email address for notifications |
+| `SMTP_VERIFY_CONNECTION` | No | `true` | Verify SMTP connection on startup |
+| `SMTP_TLS_REJECT_UNAUTHORIZED` | No | `true` | Reject invalid TLS certificates |
+
+**Note:** If `SMTP_SECURE` and `SMTP_SECURITY_PROTOCOL` are both set, `SMTP_SECURE` takes precedence.
 
 ### Timezone Examples
 
 ```env
 TZ=UTC                    # Universal Time
 TZ=America/New_York       # US Eastern
-TZ=America/Los_Angeles    # US Pacific  
+TZ=America/Los_Angeles    # US Pacific
 TZ=Europe/London          # UK
 TZ=Asia/Tokyo             # Japan
 TZ=Australia/Sydney       # Australia
@@ -148,6 +214,36 @@ Expected response: `{"status":"ok"}`
 
 ## Data Persistence & Backup
 
+### Storage
+
+The app uses **SQLite** for data storage. The database is stored in `/data` inside the container.
+
+**Automatic Setup:**
+- Data folder is **automatically created** if it doesn't exist
+- Entrypoint script validates permissions and provides error messages
+- No manual setup required
+
+**Volume Options:**
+```yaml
+# Option 1: Local directory (default)
+volumes:
+  - ./data:/data
+
+# Option 2: Named volume
+volumes:
+  - journal-data:/data
+
+# Option 3: Custom path
+volumes:
+  - /var/lib/journal:/data
+```
+
+**Permission Issues?**
+```bash
+# Fix ownership (container runs as user 1001)
+sudo chown -R 1001:1001 ./data
+```
+
 ### Backup Database
 
 ```bash
@@ -169,6 +265,30 @@ Use the built-in export feature:
 2. Go to **Settings** → **Data Management**
 3. Click **Export to CSV**
 4. Optionally enable encryption for the export
+
+### Reminders & Notifications
+
+The app supports automated reminders via email or webhooks:
+
+**Email Reminders:**
+- Configure SMTP settings in environment variables (see above)
+- Create reminders in the app with custom schedules
+- Receive email notifications at specified times
+- Works with Gmail, SendGrid, Mailgun, AWS SES, and more
+
+**Webhook Reminders:**
+- Send reminders to Discord, Slack, or any webhook URL
+- Automatic message formatting
+- Multiple reminders with different schedules
+- Enable/disable reminders individually
+
+**Reminder Features:**
+- Recurring schedules (select specific days of the week)
+- Custom titles and messages
+- Multiple reminders per user
+- Automatic scheduling and delivery
+
+See [SMTP Configuration Guide](SMTP_CONFIG.md) for detailed email setup instructions.
 
 ## Security
 
@@ -344,18 +464,27 @@ Very lightweight - perfect for Raspberry Pi or small VPS!
 
 ## Tech Stack
 
-- **Frontend:** React, TypeScript, Vite, TailwindCSS, shadcn/ui
+- **Frontend:** React 18, TypeScript, Vite, TailwindCSS, shadcn/ui
 - **Backend:** Node.js, Express, TypeScript
 - **Database:** SQLite with better-sqlite3
-- **Editor:** Tiptap (WYSIWYG + Markdown)
+- **Editor:** Tiptap (WYSIWYG + Markdown support)
+- **Charts:** Recharts for analytics and visualizations
 - **Encryption:** Node.js crypto (AES-256-GCM)
 - **Auth:** bcrypt + express-session
+- **Notifications:** Nodemailer (SMTP) + Webhooks
+- **Date Handling:** date-fns
+- **Markdown:** markdown-it, turndown (HTML to Markdown)
 
 ## Links
 
 - **Source Code:** [GitHub Repo](https://github.com/koolboy145/private-journal)
-- **Issues:** [GitHub Issues URL](https://github.com/koolboy145/private-journal/issues)
-- **Documentation:** [Full Documentation URL]
+- **Issues:** [GitHub Issues](https://github.com/koolboy145/private-journal/issues)
+- **Documentation:**
+  - [Full README](README.md) - Complete project overview
+  - [Features](FEATURES.md) - Detailed feature list
+  - [Environment Setup](ENV-SETUP-GUIDE.md) - Complete environment configuration
+  - [SMTP Configuration](SMTP_CONFIG.md) - Email notification setup
+  - [ARM Support](ARM-SUPPORT.md) - Raspberry Pi and ARM deployment guide
 - **License:** [MIT](LICENSE)
 
 ## Contributing
@@ -368,6 +497,10 @@ Contributions welcome! Please:
 ## Support
 
 - 📖 [Full Documentation](README.md)
+- 📋 [Features Guide](FEATURES.md)
+- ⚙️ [Environment Setup](ENV-SETUP-GUIDE.md)
+- 📧 [SMTP Configuration](SMTP_CONFIG.md)
+- 🍓 [ARM Support](ARM-SUPPORT.md)
 - 🐛 [Report Issues](https://github.com/koolboy145/private-journal/issues)
 
 ## License
@@ -379,4 +512,3 @@ MIT License - see [LICENSE](LICENSE) file for details.
 **⚠️ Security Reminder:** This is a self-hosted application. You are responsible for securing your deployment, managing encryption keys, and backing up your data. Always use HTTPS in production and keep your encryption keys secure!
 
 **Made with ❤️ for privacy-conscious journaling**
-

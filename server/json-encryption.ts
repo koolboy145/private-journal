@@ -4,10 +4,10 @@ import { promisify } from 'util';
 const scryptAsync = promisify(scrypt);
 
 /**
- * Encrypt CSV content with user-provided password
- * Returns: ENCRYPTED:<algorithm>:<iv>:<authTag>:<data>
+ * Encrypt JSON content with user-provided password
+ * Returns: ENCRYPTED:<algorithm>:<salt>:<iv>:<authTag>:<data>
  */
-export async function encryptCSV(csvContent: string, password: string): Promise<string> {
+export async function encryptJSON(jsonContent: string, password: string): Promise<string> {
   try {
     // Derive key from password
     const salt = randomBytes(16);
@@ -16,7 +16,7 @@ export async function encryptCSV(csvContent: string, password: string): Promise<
 
     const cipher = createCipheriv('aes-256-gcm', key, iv);
 
-    let encrypted = cipher.update(csvContent, 'utf8', 'base64');
+    let encrypted = cipher.update(jsonContent, 'utf8', 'base64');
     encrypted += cipher.final('base64');
 
     const authTag = cipher.getAuthTag();
@@ -24,15 +24,15 @@ export async function encryptCSV(csvContent: string, password: string): Promise<
     // Format: ENCRYPTED:aes-256-gcm:salt:iv:authTag:data
     return `ENCRYPTED:aes-256-gcm:${salt.toString('base64')}:${iv.toString('base64')}:${authTag.toString('base64')}:${encrypted}`;
   } catch (error) {
-    console.error('CSV encryption error:', error);
-    throw new Error('Failed to encrypt CSV');
+    console.error('JSON encryption error:', error);
+    throw new Error('Failed to encrypt JSON');
   }
 }
 
 /**
- * Decrypt CSV content with user-provided password
+ * Decrypt JSON content with user-provided password
  */
-export async function decryptCSV(encryptedContent: string, password: string): Promise<string> {
+export async function decryptJSON(encryptedContent: string, password: string): Promise<string> {
   try {
     // Check if content is encrypted
     if (!encryptedContent.startsWith('ENCRYPTED:')) {
@@ -61,14 +61,14 @@ export async function decryptCSV(encryptedContent: string, password: string): Pr
 
     return decrypted;
   } catch (error) {
-    console.error('CSV decryption error:', error);
-    throw new Error('Failed to decrypt CSV - incorrect password or corrupted file');
+    console.error('JSON decryption error:', error);
+    throw new Error('Failed to decrypt JSON - incorrect password or corrupted file');
   }
 }
 
 /**
- * Check if CSV content is encrypted
+ * Check if JSON content is encrypted
  */
-export function isCSVEncrypted(content: string): boolean {
+export function isJSONEncrypted(content: string): boolean {
   return content.startsWith('ENCRYPTED:aes-256-gcm:');
 }

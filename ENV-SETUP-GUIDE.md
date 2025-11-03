@@ -99,12 +99,17 @@ MyVerySecureRandomKey1234567890!@#$
 - **Example:** `HOST_PORT=8080`
 - **Usage:** Access app at `http://localhost:8080`
 
-#### `DB_PATH`
+#### `DB_VOLUME`
 - **Required:** No (Docker only)
 - **Default:** `./data`
-- **Description:** Directory on host for database storage
-- **Example:** `DB_PATH=/var/lib/journal/data`
-- **Note:** Database file created at `${DB_PATH}/journal.db`
+- **Description:** Volume mount for database storage (Docker host path or named volume)
+- **Auto-Created:** Yes - folder is automatically created if it doesn't exist
+- **Examples:**
+  - Local directory: `DB_VOLUME=./data`
+  - Named volume: `DB_VOLUME=journal-data`
+  - Custom path: `DB_VOLUME=/var/lib/journal/data`
+- **Note:** Database file created at `/data/journal.db` inside container
+- **Permissions:** Container runs as user `1001`, ensure host folder is writable
 
 #### `TZ`
 - **Required:** No
@@ -309,7 +314,7 @@ ENCRYPTION_KEY=Kx8vN2mP9qR5tYuI3oL7jK6hG4fD1sA0wZ9xC8vB5nM=
 ENCRYPTION_KEY=Kx8vN2mP9qR5tYuI3oL7jK6hG4fD1sA0wZ9xC8vB5nM=
 NODE_ENV=production
 HOST_PORT=8080
-DB_PATH=/var/lib/journal/data
+DB_VOLUME=/var/lib/journal/data
 TZ=America/New_York
 FRONTEND_URL=https://journal.yourdomain.com
 ```

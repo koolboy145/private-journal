@@ -4,13 +4,13 @@ import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
-import { 
-  Bold, 
-  Italic, 
-  Underline as UnderlineIcon, 
-  Strikethrough, 
-  Code, 
-  List, 
+import {
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Strikethrough,
+  Code,
+  List,
   ListOrdered,
   Quote,
   Heading1,
@@ -104,14 +104,14 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
       return null;
     }
 
-    const ToolbarButton = ({ 
-      onClick, 
-      isActive = false, 
-      children, 
-      title 
-    }: { 
-      onClick: () => void; 
-      isActive?: boolean; 
+    const ToolbarButton = ({
+      onClick,
+      isActive = false,
+      children,
+      title
+    }: {
+      onClick: () => void;
+      isActive?: boolean;
       children: React.ReactNode;
       title: string;
     }) => (
@@ -132,13 +132,13 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
 
     const addLink = (e: React.MouseEvent) => {
       e.preventDefault();
-      
+
       // If already a link, unlink it
       if (editor.isActive('link')) {
         editor.chain().focus().unsetLink().run();
         return;
       }
-      
+
       // Otherwise, prompt for URL and add link
       const url = window.prompt('Enter URL:');
       if (url) {
@@ -295,10 +295,10 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
 
         {/* Editor */}
         <EditorContent editor={editor} className="min-h-[400px]" />
-        
+
         {/* Markdown Shortcuts Info */}
         <div className="border-t bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
-          <span className="font-medium">Markdown shortcuts:</span> 
+          <span className="font-medium">Markdown shortcuts:</span>
           <span className="ml-2">**bold** *italic* ~~strike~~ `code` # heading &gt; quote - list</span>
         </div>
       </div>
@@ -307,4 +307,3 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
 );
 
 RichTextEditor.displayName = 'RichTextEditor';
-

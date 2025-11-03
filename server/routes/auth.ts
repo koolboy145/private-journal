@@ -1,9 +1,30 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import { userQueries } from '../database.js';
+import { userQueries, tagQueries } from '../database.js';
 
 const router = Router();
+
+// Default tags to initialize for new users
+const DEFAULT_TAGS = ['growth', 'inspiration', 'ideas', 'routine', 'vacation', 'purpose', 'curiosity'];
+
+// Initialize default tags for a user
+async function initializeDefaultTags(userId: string) {
+  const now = new Date().toISOString();
+
+  for (const tagName of DEFAULT_TAGS) {
+    try {
+      // Check if tag already exists
+      const existing = tagQueries.findByUserIdAndName.get(userId, tagName) as any;
+      if (!existing) {
+        const tagId = randomUUID();
+        tagQueries.create.run(tagId, userId, tagName, null, now);
+      }
+    } catch (error) {
+      console.error(`Failed to initialize tag ${tagName}:`, error);
+    }
+  }
+}
 
 // Register new user
 router.post('/register', async (req, res) => {
@@ -36,12 +57,18 @@ router.post('/register', async (req, res) => {
     const user = {
       id: userId,
       username,
+      firstName: null,
+      lastName: null,
+      email: null,
       createdAt,
     };
 
     // Set session
     req.session.userId = userId;
     req.session.username = username;
+
+    // Initialize default tags for new user
+    await initializeDefaultTags(userId);
 
     res.status(201).json({ user });
   } catch (error) {
@@ -75,11 +102,20 @@ router.post('/login', async (req, res) => {
     req.session.userId = user.id;
     req.session.username = user.username;
 
+    // Initialize default tags if user doesn't have any (for existing users)
+    const userTags = tagQueries.findByUserId.all(user.id) as any[];
+    if (userTags.length === 0) {
+      await initializeDefaultTags(user.id);
+    }
+
     // Return user without password hash
     res.json({
       user: {
         id: user.id,
         username: user.username,
+        firstName: user.first_name || null,
+        lastName: user.last_name || null,
+        email: user.email || null,
         createdAt: user.created_at,
       },
     });
@@ -115,6 +151,9 @@ router.get('/me', (req, res) => {
     user: {
       id: user.id,
       username: user.username,
+      firstName: user.first_name || null,
+      lastName: user.last_name || null,
+      email: user.email || null,
       createdAt: user.created_at,
     },
   });
@@ -162,6 +201,51 @@ router.put('/password', async (req, res) => {
   }
 });
 
+// Update profile
+router.put('/profile', (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const { firstName, lastName, email } = req.body;
+
+    // Validate email format if provided
+    if (email && email.trim() !== '') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) {
+        return res.status(400).json({ error: 'Invalid email format' });
+      }
+    }
+
+    // Update profile
+    userQueries.updateProfile.run(
+      firstName && firstName.trim() !== '' ? firstName.trim() : null,
+      lastName && lastName.trim() !== '' ? lastName.trim() : null,
+      email && email.trim() !== '' ? email.trim() : null,
+      req.session.userId
+    );
+
+    // Get updated user
+    const user = userQueries.findById.get(req.session.userId) as any;
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      user: {
+        id: user.id,
+        username: user.username,
+        firstName: user.first_name || null,
+        lastName: user.last_name || null,
+        email: user.email || null,
+        createdAt: user.created_at,
+      },
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
 export default router;
-
-

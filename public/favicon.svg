@@ -1,0 +1,112 @@
+<svg width="96" height="96" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Book Cover Gradients for 3D effect -->
+    <linearGradient id="bookCoverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700" />
+      <stop offset="30%" stop-color="#FFC700" />
+      <stop offset="70%" stop-color="#FFB700" />
+      <stop offset="100%" stop-color="#FFA500" />
+    </linearGradient>
+    <linearGradient id="bookSpineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFB700" />
+      <stop offset="50%" stop-color="#FFC700" />
+      <stop offset="100%" stop-color="#FFD700" />
+    </linearGradient>
+    <linearGradient id="bookHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.3" />
+      <stop offset="30%" stop-color="#FFFFFF" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Pencil Gradients -->
+    <linearGradient id="pencilBodyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a2a2a" />
+      <stop offset="30%" stop-color="#000000" />
+      <stop offset="70%" stop-color="#000000" />
+      <stop offset="100%" stop-color="#1a1a1a" />
+    </linearGradient>
+    <linearGradient id="pencilMetalGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E0E0E0" />
+      <stop offset="50%" stop-color="#A9A9A9" />
+      <stop offset="100%" stop-color="#D3D3D3" />
+    </linearGradient>
+    <linearGradient id="pencilHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.2" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Shadow filters -->
+    <filter id="bookShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+      <feOffset dx="1" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Book Shadow -->
+  <ellipse cx="50" cy="88" rx="35" ry="6" fill="#000000" opacity="0.15" />
+
+  <!-- Book Back Layer (for depth) -->
+  <rect x="20" y="22" width="52" height="60" rx="5" fill="#FFB700" opacity="0.2" />
+
+  <!-- Book Spine (left edge, thicker and rounded) -->
+  <path d="M 18 20 Q 16 28 18 82 Q 20 82 20 82 Q 20 28 18 20 Z" fill="url(#bookSpineGradient)" />
+  <ellipse cx="19" cy="51" rx="3" ry="30" fill="#FFB700" opacity="0.5" />
+
+  <!-- Book Front Cover (golden-yellow, matte finish) -->
+  <rect x="22" y="20" width="50" height="58" rx="4" fill="url(#bookCoverGradient)" filter="url(#bookShadow)" />
+
+  <!-- Cover Highlight (top-front light source) -->
+  <rect x="22" y="20" width="50" height="20" fill="url(#bookHighlight)" rx="4" />
+
+  <!-- Subtle shading on right edge -->
+  <rect x="68" y="20" width="4" height="58" fill="#FFA500" opacity="0.3" rx="2" />
+
+  <!-- Pages Stack (bottom edge, cream-colored, recessed) -->
+  <rect x="24" y="74" width="46" height="6" fill="#F5F5DC" rx="2" />
+  <!-- Page lines (individual sheets) -->
+  <line x1="26" y1="76" x2="68" y2="76" stroke="#E8E8D8" stroke-width="0.5" opacity="0.6" />
+  <line x1="26" y1="77.5" x2="68" y2="77.5" stroke="#E8E8D8" stroke-width="0.5" opacity="0.6" />
+  <line x1="26" y1="79" x2="68" y2="79" stroke="#E8E8D8" stroke-width="0.5" opacity="0.6" />
+
+  <!-- Pencil (black, vertical, tucked into right side) -->
+  <!-- Pencil Shadow -->
+  <ellipse cx="68" cy="82" rx="4" ry="2" fill="#000000" opacity="0.2" />
+
+  <!-- Pencil Body (black, matte finish) -->
+  <rect x="66" y="14" width="10" height="54" rx="2" fill="url(#pencilBodyGradient)" />
+
+  <!-- Pencil Highlight (for 3D effect) -->
+  <rect x="67" y="16" width="6" height="50" fill="url(#pencilHighlight)" rx="1" />
+
+  <!-- Pencil Tip (extends below book, sharpened with wood showing) -->
+  <!-- Wood portion (tan/brown) -->
+  <polygon points="66,68 76,68 71,78" fill="#D2691E" />
+  <polygon points="67,70 75,70 71,76" fill="#CD853F" />
+  <!-- Graphite tip (dark grey/black) -->
+  <polygon points="68,72 74,72 71,76" fill="#333333" />
+  <polygon points="69.5,73.5 72.5,73.5 71,75" fill="#1a1a1a" />
+
+  <!-- Metal Band (silver/light grey, top of pencil) -->
+  <rect x="66" y="14" width="10" height="6" fill="url(#pencilMetalGradient)" rx="1" />
+  <!-- Metal band detail lines -->
+  <line x1="67" y1="16" x2="75" y2="16" stroke="#808080" stroke-width="0.5" opacity="0.5" />
+  <line x1="67" y1="18" x2="75" y2="18" stroke="#808080" stroke-width="0.5" opacity="0.5" />
+
+  <!-- Eraser (pink/red, above metal band) -->
+  <rect x="67" y="8" width="8" height="6" rx="2" fill="#FFB6C1" />
+  <!-- Eraser highlight -->
+  <rect x="68" y="9" width="6" height="4" rx="1" fill="#FFC0CB" opacity="0.6" />
+  <!-- Eraser base -->
+  <rect x="67.5" y="13.5" width="7" height="1" fill="#FFB6C1" opacity="0.5" />
+
+  <!-- Additional depth shadow for pencil -->
+  <ellipse cx="71" cy="40" rx="3" ry="25" fill="#000000" opacity="0.1" />
+</svg>

@@ -34,7 +34,7 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!loginUsername || !loginPassword) {
       toast.error('Please fill in all fields');
       return;
@@ -55,7 +55,7 @@ export default function Login() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!signupUsername || !signupPassword || !signupConfirmPassword) {
       toast.error('Please fill in all fields');
       return;
@@ -106,7 +106,7 @@ export default function Login() {
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
@@ -135,7 +135,7 @@ export default function Login() {
                   </Button>
                 </form>
               </TabsContent>
-              
+
               <TabsContent value="signup">
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div className="space-y-2">

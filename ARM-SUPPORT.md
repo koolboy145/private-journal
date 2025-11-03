@@ -346,12 +346,12 @@ docker buildx imagetools inspect yourusername/private-journal:latest
 # Name: docker.io/yourusername/private-journal:latest
 # MediaType: application/vnd.docker.distribution.manifest.list.v2+json
 # Digest: sha256:...
-# 
+#
 # Manifests:
 #   Name: docker.io/yourusername/private-journal:latest@sha256:...
 #   MediaType: application/vnd.docker.distribution.manifest.v2+json
 #   Platform: linux/amd64
-#   
+#
 #   Name: docker.io/yourusername/private-journal:latest@sha256:...
 #   MediaType: application/vnd.docker.distribution.manifest.v2+json
 #   Platform: linux/arm64

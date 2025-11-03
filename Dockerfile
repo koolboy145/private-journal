@@ -70,6 +70,10 @@ RUN npm ci --only=production && \
 COPY --from=frontend-builder /app/dist ./dist
 COPY --from=backend-builder /app/dist ./server-dist
 
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Create directory for database
 RUN mkdir -p /data
 
@@ -94,6 +98,8 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/health || exit 1
 
+# Use entrypoint script
+ENTRYPOINT ["docker-entrypoint.sh"]
+
 # Run the application
 CMD ["node", "server-dist/server/index.js"]
-

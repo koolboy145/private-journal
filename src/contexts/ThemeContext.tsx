@@ -1,36 +1,39 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-
-type Theme = 'light' | 'dark';
+import { applyTheme, getThemeName, setThemeName, parseThemeName, type ThemeName } from '../lib/themes';
 
 interface ThemeContextType {
-  theme: Theme;
-  toggleTheme: () => void;
+  themeName: ThemeName;
+  setThemeName: (themeName: ThemeName) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>('dark'); // Default to dark
+  const [themeName, setThemeNameState] = useState<ThemeName>(() => {
+    return getThemeName();
+  });
 
+  // Initialize theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('journal_theme') as Theme;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
+    const savedThemeName = getThemeName();
+    setThemeNameState(savedThemeName);
+    applyTheme(savedThemeName);
   }, []);
 
+  // Apply theme changes
   useEffect(() => {
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(theme);
-    localStorage.setItem('journal_theme', theme);
-  }, [theme]);
+    applyTheme(themeName);
+    setThemeName(themeName);
+  }, [themeName]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  const handleSetThemeName = (newThemeName: ThemeName) => {
+    setThemeNameState(newThemeName);
+    setThemeName(newThemeName);
+    applyTheme(newThemeName);
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ themeName, setThemeName: handleSetThemeName }}>
       {children}
     </ThemeContext.Provider>
   );
